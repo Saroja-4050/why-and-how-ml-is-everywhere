@@ -34,14 +34,12 @@ python3 etl_pipeline.py
 ```
 
 ### What it does:
-1. **Scans** all `.json.gz` and `.jsonl.gz` files in `modded_s2orc_data/s2orc_data/`
-2. **Extracts** key fields:
-   - Paper ID
-   - Year
-   - Fields of study
-   - Text snippet (first 2000 chars)
-   - Citations (if available)
-   - Metadata
+1. **Scans** all `.json.gz` and `.jsonl.gz` files in `modular-s2orc-data/` (train, test, and validation)
+2. **Extracts** ALL fields with FULL text preservation:
+   - Paper ID (required - files without ID are skipped)
+   - Year, Fields of study, Full text (100% preserved)
+   - Metadata, Attributes, Quality control fields
+   - Audit trails (source, created, added, version)
 3. **Transforms** data with optimized types
 4. **Saves** to Parquet files in `processed_parquet/` directory
 
@@ -62,7 +60,7 @@ processed_parquet/
 - Safe to re-run if interrupted
 
 ### ✅ Memory Management
-- Processes in chunks (10,000 records at a time)
+- Processes in chunks (5,000 records at a time)
 - Automatic garbage collection
 - Handles large files efficiently
 
@@ -87,7 +85,7 @@ Each Parquet file contains:
 | `ext_fields` | string | Extended fields (comma-separated) |
 | `citations` | string | Citation IDs (comma-separated) |
 | `citation_count` | int16 | Number of citations |
-| `text_snippet` | string | First 2000 characters of text |
+| `text` | string | **FULL TEXT** (100% preserved, no limits) |
 | `text_length` | int32 | Full text length |
 | `source` | string | Data source (usually "s2") |
 | `created` | string | Creation timestamp |
@@ -147,22 +145,36 @@ pip install pandas pyarrow
 - Processing ~300 files takes time
 - Use SSD storage for better I/O performance
 
+## 📊 Processing Results
+
+### Expected Output
+- **Total source files:** ~3,747 files (1,249 train + 1,249 test + 1,249 validation)
+- **Processing:** ALL files including validation set
+- **Output:** Parquet files in `processed_parquet/` directory
+
+### Known Issues
+- **Empty files:** Some test files (677) are empty (44-67 bytes, just gzip headers)
+  - These contain no valid data and are correctly skipped
+  - This is a data quality issue, not a code bug
+- **Train files:** 100% success rate expected
+- **Test files:** ~45.8% success rate (due to empty files in source data)
+
+### Logs
+- Detailed logs saved to `etl_logs/etl_YYYYMMDD_HHMMSS.log`
+- Check logs for processing status and any errors
+
 ## Next Steps
 
 After ETL completes:
 1. Verify output: `ls -lh processed_parquet/`
 2. Check record count: Load a sample file and inspect
-3. Proceed to Phase 2: Topic Modeling / Classification
-
-## Example: Quick Test
-
-Test on a small subset first:
-```bash
-# Create test directory with one file
-mkdir -p test_data/train
-cp modded_s2orc_data/s2orc_data/Economics,2017-2019/train/Economics-2017.gz-0000.json.gz test_data/train/
-
-# Modify SOURCE_ROOT in script temporarily to "test_data"
-# Run ETL
-python3 etl_pipeline.py
-```
+3. **Start Jupyter Notebook for analysis:**
+   ```bash
+   # Make sure you're in the nvidia_impact_env environment
+   conda activate nvidia_impact_env
+   jupyter lab
+   # Or use the helper script:
+   ./start_notebook.sh
+   ```
+4. Open `data_analysis.ipynb` for data exploration and analysis
+5. Proceed to Phase 2: Topic Modeling / Classification
