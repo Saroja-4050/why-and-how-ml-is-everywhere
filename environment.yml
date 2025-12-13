@@ -1,0 +1,29 @@
+name: nvidia_impact_env
+channels:
+  - rapidsai      # Primary channel for RAPIDS
+  - conda-forge   # Critical for ARM/aarch64 utilities
+  - nvidia        # CUDA drivers
+dependencies:
+  # --- Core NVIDIA RAPIDS Stack (Relaxed Versions) ---
+  # We use '24.10' but allow minor patch variations
+  - rapids=24.10
+  - python=3.10
+  # Allow any CUDA 12 version (12.0, 12.1, 12.2) to match your specific driver
+  - cuda-version=12.*
+
+  # --- Visualization ---
+  - cuxfilter
+  - plotly
+  - jupyterlab
+
+  # --- AI & Utils ---
+  - sentence-transformers
+  - langchain
+  - faiss-gpu          # Conda-forge provides this for aarch64
+  - pip
+
+  # --- PIP Overrides (Critical for ARM Conflicts) ---
+  - pip:
+    # We install these via PIP to avoid Conda 'pynvml' conflicts
+    - nvidia-ml-py
+    - pynvml
