@@ -1,0 +1,53 @@
+# Large data directories
+s2orc_data/
+observatory_run/
+processed_parquet/
+etl_logs/
+
+# Large data files
+*.jsonl
+*.jsonl.gz
+*.gz
+*.parquet
+*.npy
+*.pkl
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Cache
+cache/
+*.sqlite
+*.db
+
