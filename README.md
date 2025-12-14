@@ -150,39 +150,45 @@ All datasets are partitioned by field and publication year for efficient queryin
 
 ## Metrics & Outputs
 
+For detailed formulas and calculations, see [FORMULAS.md](FORMULAS.md).
+
 ### Paper-Level Metrics
 
 - **ML Impact Score**: Composite metric (0.0-1.0)
-  - Formula: `ML_Probability × (45% × Adoption + 35% × Impact + 20% × Reproducibility)`
-  - Higher = more ML usage + higher impact + better reproducibility
+  - **Formula**: `ML_Probability × (0.45 × Adoption_Normalized + 0.35 × Impact_Normalized + 0.20 × Reproducibility_Normalized)`
+  - **Weights**: Adoption (45%), Impact (35%), Reproducibility (20%)
+  - **Higher = more ML usage + higher impact + better reproducibility**
   
 - **Reproducibility Risk Score**: Risk assessment (0.0-1.0)
-  - Formula: `ML_Probability × (1 - Reproducibility)`
-  - Higher = higher risk (ML papers harder to reproduce)
+  - **Formula**: `ML_Probability × (1.0 - Reproducibility_Normalized)`
+  - **Higher = higher risk** (ML papers harder to reproduce)
 
 - **Individual Predictions**: Adoption level, impact scope, reproducibility level (with confidence scores)
 
 ### Field-Year Metrics
 
 Aggregated by field and publication year:
-- `ml_share`: Percentage of papers using ML (0.0-1.0)
-- `avg_ml_impact`: Average ML impact score
-- `avg_repro_risk`: Average reproducibility risk
-- `p90_ml_impact`, `p99_ml_impact`: Top 10% and 1% impact scores
-- `ml_share_yoy`, `avg_ml_impact_yoy`: Year-over-year changes
+- `ml_share`: **Formula**: `MEAN(is_ml_prob)` - Percentage of papers using ML (0.0-1.0)
+- `avg_ml_impact`: **Formula**: `MEAN(ml_impact_score)` - Average ML impact score
+- `avg_repro_risk`: **Formula**: `MEAN(repro_risk)` - Average reproducibility risk
+- `p90_ml_impact`, `p99_ml_impact`: **Formula**: `QUANTILE(ml_impact_score, 0.90/0.99)` - Top 10% and 1% impact scores
+- `ml_share_yoy`: **Formula**: `ml_share[year] - ml_share[year-1]` - Year-over-year change in ML adoption
+- `avg_ml_impact_yoy`: **Formula**: `avg_ml_impact[year] - avg_ml_impact[year-1]` - Year-over-year change in impact
 
 ### Field-Level Metrics
 
 Overall field comparisons:
-- `ml_share`: Overall ML adoption rate
-- `avg_ml_impact`: Average impact across all papers
-- `p95_ml_impact`: 95th percentile impact (top 5% papers)
-- `avg_repro_risk`: Average reproducibility risk
+- `ml_share`: **Formula**: `MEAN(is_ml_prob)` - Overall ML adoption rate
+- `avg_ml_impact`: **Formula**: `MEAN(ml_impact_score)` - Average impact across all papers
+- `p95_ml_impact`: **Formula**: `QUANTILE(ml_impact_score, 0.95)` - 95th percentile impact (top 5% papers)
+- `avg_repro_risk`: **Formula**: `MEAN(repro_risk)` - Average reproducibility risk
 
 **Output Files**:
 - `gold/paper_scores.parquet`: All paper-level metrics (36,821 rows)
 - `gold/field_year_metrics.parquet`: Field-year aggregations
 - `gold/field_metrics.parquet`: Field-level summaries
+
+**For detailed formulas and calculation methods, see [FORMULAS.md](FORMULAS.md).**
 
 ## Scalability & GPU Acceleration
 
