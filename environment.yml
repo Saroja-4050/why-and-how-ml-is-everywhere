@@ -6,10 +6,11 @@ channels:
 dependencies:
   # --- Core NVIDIA RAPIDS Stack (Relaxed Versions) ---
   # We use '24.10' but allow minor patch variations
-  - rapids=24.10
-  - python=3.10
-  # Allow any CUDA 12 version (12.0, 12.1, 12.2) to match your specific driver
-  - cuda-version=12.*
+  - rapids=25.12
+  - python=3.13
+  - pyarrow=20.0.0
+  # Allow any CUDA 13 version (13.0, 13.1, 13.2) to match your specific driver
+  - cuda-version=13.*
 
   # --- Visualization ---
   - cuxfilter
@@ -19,7 +20,7 @@ dependencies:
   # --- AI & Utils ---
   - sentence-transformers
   - langchain
-  - faiss-gpu          # Conda-forge provides this for aarch64
+  # - faiss-gpu          # Conda-forge provides this for aarch64
   - pip
 
   # --- PIP Overrides (Critical for ARM Conflicts) ---
